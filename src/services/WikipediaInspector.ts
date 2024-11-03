@@ -86,6 +86,13 @@ export class WikipediaInspector {
     return column;
   }
 
+  /**
+   * Generates a chart based on columns extracted
+   * @param url - Wikipedia URL
+   * @param fileName - Name of image to save after generated graph
+   * @return A promise that resolve when the chart generated successfully and saved
+   * @throw An error if no columns found or an issue during generation process
+   */
   async generateChart(url: string, fileName: string): Promise<void> {
     try {
       // Fetch numeric columns from Wikipedia URL
