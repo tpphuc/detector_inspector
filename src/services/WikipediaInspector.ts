@@ -67,7 +67,7 @@ export class WikipediaInspector {
       // Handle errors and throw error message
       const errorMsg =
         error instanceof Error ? error.message : "Something went wrong";
-      throw new Error(`Failed to get tables: ${errorMsg}`);
+      throw new Error(errorMsg);
     }
   }
 
@@ -253,7 +253,7 @@ export class WikipediaInspector {
     } catch (error) {
       const errorMsg =
         error instanceof Error ? error.message : "Something went wrong";
-      throw new Error(`Failed to generate chart: ${errorMsg}`);
+      throw new Error(errorMsg);
     }
   }
 }
