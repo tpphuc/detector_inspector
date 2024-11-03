@@ -11,6 +11,11 @@ const WIKIPEDIA_API_PARAMS = {
   formatversion: "2",
 };
 
+interface ColumnData {
+  header: string;
+  values: number[];
+}
+
 export class WikipediaInspector {
   /**
    * Extract page title from a Wikipedia URL
@@ -25,8 +30,8 @@ export class WikipediaInspector {
   /**
    * Fetch and parse table from Wikipedia URL
    * @param url - Wikipedia URL
-   * @return A promise array of Element.
-   * @throw An error if the fetch failed or no tables are found.
+   * @return A promise array of Element
+   * @throw An error if the fetch failed or no tables are found
    */
   async getTables(url: string): Promise<Element[]> {
     try {
@@ -63,6 +68,39 @@ export class WikipediaInspector {
       const errorMsg =
         error instanceof Error ? error.message : "Something went wrong";
       throw new Error(`Failed to get tables: ${errorMsg}`);
+    }
+  }
+
+  /**
+   * Retrieve table and extract column data
+   * @param url - Wikipedia URL
+   * @return A promise array of ColumnData contain extracted column data
+   * @throw An error if the fetch failed or no tables are found
+   */
+  async getColumns(url: string): Promise<ColumnData[]> {
+    // Fetch table from Wikipedia URL
+    const tables = await this.getTables(url);
+    // Initial an array to stored the extracted column data
+    const column: ColumnData[] = [];
+    // TODO: extract column data and push it to result
+    return column;
+  }
+
+  async generateChart(url: string, fileName: string): Promise<void> {
+    try {
+      // Fetch numeric columns from Wikipedia URL
+      const columns = await this.getColumns(url);
+
+      // Check if no numeric columns found then throw an error
+      if (columns.length === 0) {
+        throw new Error("No numeric columns found in the tables");
+      }
+
+      //TODO: save chart as image with fileName
+    } catch (error) {
+      const errorMsg =
+        error instanceof Error ? error.message : "Something went wrong";
+      throw new Error(`Failed to generate chart: ${errorMsg}`);
     }
   }
 }

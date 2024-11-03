@@ -1,4 +1,5 @@
 import React from "react";
+import { WikipediaInspector } from "../services/WikipediaInspector";
 
 const DetectorInspector: React.FC = () => {
   const [url, setUrl] = React.useState("");
@@ -44,8 +45,12 @@ const DetectorInspector: React.FC = () => {
     try {
       setLoading(true);
       setError("");
-      // TODO: Create WikipediaInspector Service to generate graph
-      // TODO: generate graph then save as image
+
+      // Using WikipediaInspector instance
+      const inspector = new WikipediaInspector();
+      // Generate graph
+      await inspector.generateChart(url, "chart.png");
+
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
