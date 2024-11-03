@@ -35,6 +35,7 @@ const DetectorInspector: React.FC = () => {
    */
   const onChangeURL = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUrl(e.target.value);
+    setError(""); // Reset error state
     // validate if input has value (prevent trigger validation for empty input)
     if (e.target.value) {
       validateUrl(e.target.value);
@@ -45,12 +46,10 @@ const DetectorInspector: React.FC = () => {
     try {
       setLoading(true);
       setError("");
-
       // Using WikipediaInspector instance
       const inspector = new WikipediaInspector();
       // Generate graph
       await inspector.generateChart(url, "chart.png");
-
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -59,17 +58,24 @@ const DetectorInspector: React.FC = () => {
   };
 
   return (
-    <div>
-      <input
-        value={url}
-        onChange={onChangeURL}
-        placeholder="Enter Wikipedia URL"
-        type="url"
-      />
-      <button disabled={!!error || !url} onClick={onScan}>
-        {loading ? "Loading" : "Scan"}
-      </button>
-      {error && <div style={{ color: "red" }}>{error}</div>}
+    <div className="app-container">
+      <div className="input-container">
+        <input
+          className="input-field"
+          value={url}
+          onChange={onChangeURL}
+          placeholder="Enter Wikipedia URL"
+          type="url"
+        />
+        <button
+          className="scan-button"
+          disabled={!!error || !url}
+          onClick={onScan}
+        >
+          {loading ? "Loading" : "Scan"}
+        </button>
+      </div>
+      {error && <div className="error">{error}</div>}
     </div>
   );
 };
