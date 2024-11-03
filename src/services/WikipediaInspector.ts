@@ -1,3 +1,5 @@
+import { Chart, registerables } from "chart.js";
+
 /**
  * Document for Wikipedia API
  * Reference: https://www.mediawiki.org/wiki/API:Tutorial
@@ -136,6 +138,102 @@ export class WikipediaInspector {
   }
 
   /**
+   * Save a chart as image based on column data
+   * @param url - Wikipedia URL
+   * @param columnData - An array of ColumnData contain height value
+   * @param fileName - Name of image to save after generated graph
+   * @return A promise that resolve when the chart generated successfully and saved
+   * @throw An error if cannot get the canvas context
+   */
+  async saveChart(
+    url: string,
+    columnData: ColumnData[],
+    fileName: string
+  ): Promise<void> {
+    Chart.register(...registerables);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      throw new Error("Could not get canvas context");
+    }
+
+    const chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: Array.from(
+          { length: columnData[0].values.length },
+          (_, i) => `Record ${i + 1}`
+        ),
+        datasets: [
+          {
+            label: "Height (meters)",
+            data: columnData[0].values,
+            borderColor: "rgb(75, 192, 192)",
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            tension: 0.1,
+            fill: true,
+            pointRadius: 5,
+            pointHoverRadius: 8,
+          },
+        ],
+      },
+      options: {
+        responsive: false,
+        scales: {
+          y: {
+            beginAtZero: false,
+            title: {
+              display: true,
+              text: "Height (meters)",
+            },
+            ticks: {
+              callback: (value) => Number(value).toFixed(2),
+            },
+          },
+          x: {
+            title: {
+              display: true,
+              text: "Record Progression",
+            },
+          },
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: this.getPageTitle(url),
+            font: {
+              size: 16,
+              weight: "bold",
+            },
+          },
+          legend: {
+            display: true,
+            position: "bottom",
+          },
+        },
+      },
+    });
+
+    // IMPORTANT: add setTimeout to wait the chart render
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Get the data URL and create download
+    const dataUrl = canvas.toDataURL("image/png");
+    // Create and trigger download
+    const link = document.createElement("a");
+    link.download = fileName;
+    link.href = dataUrl;
+    // Simulate a click on the link to trigger the download
+    link.dispatchEvent(new MouseEvent("click"));
+    // Clean up
+    chart.destroy();
+  }
+
+  /**
    * Generates a chart based on columns extracted
    * @param url - Wikipedia URL
    * @param fileName - Name of image to save after generated graph
@@ -150,7 +248,8 @@ export class WikipediaInspector {
       if (columns.length === 0) {
         throw new Error("No numeric columns found in the tables");
       }
-      //TODO: save chart as image with fileName
+      // Generate chart and save as image
+      await this.saveChart(url, columns, fileName);
     } catch (error) {
       const errorMsg =
         error instanceof Error ? error.message : "Something went wrong";
